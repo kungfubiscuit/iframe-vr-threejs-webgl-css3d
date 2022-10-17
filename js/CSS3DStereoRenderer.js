@@ -28,6 +28,7 @@ THREE.CSS3DStereoRenderer = function () {
 	this.domElement = domElement;
 
 	//
+	
 
 	var domElementL = document.createElement( 'div' );
 	domElementL.style.display = 'inline-block';

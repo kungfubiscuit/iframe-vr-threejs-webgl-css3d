@@ -22,20 +22,23 @@ function loadIframe(url) {
 	element.style.width = '1024px';
 	element.style.height = '768px';
 	element.style.backgroundColor = 'rgba(0,127,127,' + ( Math.random() * 0.5 + 0.25 ) + ')';
-	var iframe = document.createElement( 'iframe' );
-	iframe.style.backgroundColor = '#ffffff';
-	iframe.style.width = '1024px';
-	iframe.style.height = '768px';
+
+	// create object to load external page
+	var frameObject = document.createElement( 'object' );
+	frameObject.style.backgroundColor = '#ffffff';
+	frameObject.style.width = '1024px';
+	frameObject.style.height = '768px';
 	loadTime = (new Date()).getTime();
-	iframe.src = url;
-	iframe.onload = function(e) {
+	frameObject.data = url;
+	frameObject.onload = function(e) {
 		var diff = (new Date()).getTime() - loadTime;
 		if (diff < timeOut) {
-			iframe.src = "data:text/html;charset=utf-8," + escape('<h1>XSS</h1>');
+			frameObject.data = "data:text/html;charset=utf-8," + escape('<h1>XSS</h1>');
 		}
 	};
-	element.appendChild( iframe );
+	element.appendChild( frameObject );
 	
+	// attach element div to threeJS 3d object
 	var object = new THREE.CSS3DObject( element );
 	object.position.x = Math.random() * 4000 - 2000;
 	object.position.y = Math.random() * 4000 - 2000;
@@ -45,6 +48,7 @@ function loadIframe(url) {
 	target.position.y = 0;
 	scene.add( object );
 
+	// set intitial renderer
 	if (stereoEnabled) {
 		renderer = new THREE.CSS3DStereoRenderer();
 	} else {
@@ -54,6 +58,7 @@ function loadIframe(url) {
 	renderer.domElement.style.position = 'absolute';
 	document.getElementById( 'container' ).appendChild( renderer.domElement );
 
+	// set controls
 	if (stereoEnabled) {
 		controls = new THREE.TrackballAndOrientationControls( camera, renderer.domElement );
 	} else {
@@ -143,20 +148,25 @@ function init() {
 	document.addEventListener('click', enableNoSleep, false);
 	initControls();
 	init3D(stereoEnabled);
-	loadIframe(prompt("Enter iframe URL"));
+	//loadIframe(prompt("Enter iframe URL"));
+	loadIframe("https://webflow.com/made-in-webflow/generic");
 	$(".loader").hide();
 }
 
 function init3D(stereoEnabled) {
 	if (stereoEnabled) {
+
+		// funcion pulled from CSS3DStereoRenderer
 		THREE.CSS3DObject = function ( element ) {
 
 			THREE.Object3D.call( this );
 
 			this.elementL = element.cloneNode( true );
+			// this.elementL = element;
 			this.elementL.style.position = 'absolute';
 
 			this.elementR = element.cloneNode( true );
+			// this.elementR = element;
 			this.elementR.style.position = 'absolute';
 
 			this.addEventListener( 'removed', function ( event ) {
